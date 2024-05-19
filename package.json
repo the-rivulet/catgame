@@ -1,0 +1,18 @@
+{
+	"name": "catgame",
+	"version": "1.0.0",
+	"description": "a silly game about cats",
+	"main": "null",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "frinkifail, teste and catgame dev team",
+	"license": "ISC",
+	"dependencies": {
+		"break_eternity.js": "^1.4.2"
+	},
+	"devDependencies": {
+		"vite": "^5.2.11",
+		"typescript": "^5.4.5"
+	}
+}
