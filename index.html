@@ -221,7 +221,7 @@
 		<br><textarea spellcheck="false" id="savedata" style="resize: both" placeholder="save here"></textarea>
 
 		<h3>Secret Codes</h3>
-		<button class="button" onclick="VerifyCode(document.getElementById('secretpasses').value)">
+		<button class="button" id="verify-code">
 			<div style="font-size:20px;">Input</div><textarea spellcheck="false" rows="1" cols="14" id="secretpasses"
 				maxlength="16"
 				onkeyup="this.value = this.value.replace(/[A-Z\s\.:;\\\[\]\*\+\-\?!{}]/g, '')"></textarea>

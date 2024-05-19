@@ -1,14 +1,65 @@
 import Decimal from 'break_eternity.js';
 
 let tab = 'main'
-let deltatime = 0
 let loaftime = 0
-const gel = (name) => document.getElementById(name)
+const gel = (name: string) => document.getElementById(name)!
 const newsfile = ["owo", "uwu", "hello", "uparrow", "x<sup>2</sup>"]
 
-// jacorb's code for formatting
-function exponentialFormat(num, precision) {
-	let e = num.exponent;
+const elements = {
+	buyallbutton: gel("buyallbutton"),
+	hcbutton: gel("hcbutton"),
+	hvcbutton: gel("hvcbutton"),
+	catlimbar: gel("catlimbar") as HTMLProgressElement,
+	catbarpercent: gel("catbarpercent"),
+	cats: gel("cats"),
+	cps: gel("cps"),
+	catlim: gel("catlim"),
+	catsummoners: gel("catsummoners"),
+	catfood: gel("catfood"),
+	basecats: gel("basecats"),
+	catmulti: gel("catmulti"),
+	cscost: gel("cscost"),
+	cfcost: gel("cfcost"),
+	catlimitnum: gel("catlimitnum"),
+	maxccs: gel("maxccs"),
+	ccs: gel("ccs"),
+	ls: gel("ls"),
+	bm: gel("bm"),
+	lscost: gel("lscost"),
+	bmcost: gel("bmcost"),
+	lsboost: gel("lsboost"),
+	bmboost: gel("bmboost"),
+	catssacrificed: gel("catssacrificed"),
+	sacrificedboost: gel("sacrificedboost"),
+	hc: gel("hc"),
+	hcboost: gel("hcboost"),
+	timeplayed: gel("timeplayed"),
+	energycats: gel("energycats"),
+	ecps: gel("ecps"),
+	highcats: gel("highcats"),
+	voidc: gel("voidc"),
+	exenercat: gel("exenercat"),
+	voidg: gel("voidg"),
+	hypervoidcats: gel("hypervoidcats"),
+	hypervoidcatsboost: gel("hypervoidcatsboost"),
+	voidb: gel("voidb"),
+	catsize: gel("catsize"),
+	catweight: gel("catweight"),
+	voidpower: gel("voidpower"),
+	catlimitboost: gel("catlimitboost"),
+	catgodvboost: gel("catgodvboost"),
+	hypercatvboost: gel("hypercatvboost"),
+	catlimitvboost: gel("catlimitvboost"),
+	csas: gel("csas"),
+	cfas: gel("cfas"),
+	las: gel("las"),
+	voidhypercatstuff: gel("voidhypercatstuff") as HTMLSpanElement,
+	secretpasses: gel("secretpasses") as HTMLTextAreaElement
+};
+
+//region jacorb's code for formatting
+function exponentialFormat(num: Decimal, precision: number) {
+	let e: string | number = num.exponent;
 	let m = num.mantissa;
 	if (Number(new Decimal(m).toStringWithDecimalPlaces(precision)) == 10) {
 		m = 1
@@ -17,25 +68,25 @@ function exponentialFormat(num, precision) {
 	e = ((e >= 1000) ? commaFormat(new Decimal(e), 0) : new Decimal(e).toStringWithDecimalPlaces(0))
 	return new Decimal(m).toStringWithDecimalPlaces(precision) + "e" + e
 }
-function commaFormat(num, precision) {
+function commaFormat(num: Decimal, precision: number) {
 	if (num === null || num === undefined) return "NaN"
 	if (num.mag < 0.001) return (0).toFixed(precision)
 	return num.toStringWithDecimalPlaces(precision).replace(/\B(?=(\d{3})+(?!\d))/g, "'")
 }
-function regularFormat(num, precision) {
+function regularFormat(num: Decimal, precision: number) {
 	if (num === null || num === undefined) return "NaN"
 	if (num.mag < 0.001) return (0).toFixed(precision)
 	return num.toStringWithDecimalPlaces(precision)
 }
-function fixValue(x, y = 0) {
+function fixValue(x: Decimal, y = 0) {
 	return x || new Decimal(y)
 }
-function sumValues(x) {
+function sumValues(x: Array<Decimal>) {
 	x = Object.values(x)
-	if (!x[0]) return new Decimal(0)
+	if (!x[0]) return Decimal.dZero
 	return x.reduce((a, b) => Decimal.add(a, b))
 }
-function format(decimal, precision = 2, whole = false) {
+function format(decimal: Decimal | number, precision = 2, whole = false) {
 	decimal = new Decimal(decimal)
 	if (isNaN(decimal.sign) || isNaN(decimal.layer) || isNaN(decimal.mag)) {
 		return "NaN"
@@ -57,13 +108,13 @@ function format(decimal, precision = 2, whole = false) {
 	else if (decimal.gt("1e-100000")) return exponentialFormat(decimal, decimal.gte("1e-1000") ? precision : 0)
 	else return "1/(" + format(decimal.pow(-1), precision) + ")"
 }
-function formatWhole(decimal, reallyWhole = false) {
+function formatWhole(decimal: Decimal | number, reallyWhole = false) {
 	decimal = new Decimal(decimal)
 	if (decimal.gte(1e9)) return format(decimal, 2)
 	if (decimal.lte(0.95) && !decimal.eq(0) && !reallyWhole) return format(decimal, 2)
 	else return format(decimal, 0, true)
 }
-function formatTime(s) {
+function formatTime(s: Decimal) {
 	s = new Decimal(s);
 	if (s.gte(1 / 0)) return "Forever"
 	else if (s.lt(60)) return format(s) + "s"
@@ -73,7 +124,7 @@ function formatTime(s) {
 	else if (s.lt(31536000000)) return formatWhole(s.div(31536000).floor()) + "y " + formatWhole(s.div(84600).toNumber() % 365) + "d"
 	else return formatWhole(s.div(31536000)) + "y"
 }
-function toPlaces(x, precision, maxAccepted) {
+function toPlaces(x: Decimal, precision: number, maxAccepted: number) {
 	x = new Decimal(x)
 	let result = x.toStringWithDecimalPlaces(precision)
 	if (new Decimal(result).gte(maxAccepted)) {
@@ -81,65 +132,69 @@ function toPlaces(x, precision, maxAccepted) {
 	}
 	return result
 }
-// start of teste's code
+// endregion
 
-var catspersecond = new Decimal(0)
-function formatforh(x) {
-	return format(x)
-}
-function formatforz(x) {
-	return format(x, 0, true)
-}
-var d = {
+// region start of teste's shitty code
+
+let catsPerSecond = Decimal.dZero
+
+const formatForH = (x: Decimal | number) => format(x)
+
+const formatForZ = (x: Decimal | number) => format(x, 0, true)
+
+const d = {
 	startPlaying: new Decimal(Date.now()),
 	lastTick: new Decimal(Date.now()),
-	HighCats: new Decimal(0),
+	highCats: Decimal.dZero,
 
 	cats: new Decimal(11),
-	catlimit: new Decimal(1),
+	catLimit: Decimal.dOne,
 
-	cat_summoners: new Decimal(0),
-	cat_food: new Decimal(0),
+	catSummoners: Decimal.dZero,
+	catFood: Decimal.dZero,
 
-	spent_cat_coins: new Decimal(0),
-	less_space: new Decimal(0),
-	better_magic: new Decimal(0),
+	spentCatCoins: Decimal.dZero,
+	lessSpace: Decimal.dZero,
+	betterMagic: Decimal.dZero,
 
-	cat_god_sacrificed: new Decimal(0),
+	catGodSacrificed: Decimal.dZero,
 
-	hypercats: new Decimal(0),
+	hyperCats: Decimal.dZero,
 
-	energycats: new Decimal(0),
-	energycatmilestone: new Decimal(0),
+	energyCats: Decimal.dZero,
+	energyCatMilestone: Decimal.dZero,
 
-	eautobuycs: new Decimal(1),
-	eautobuycf: new Decimal(1),
-	eautobuyl: new Decimal(1),
-	eautobuys: new Decimal(1),
+	eautobuycs: Decimal.dOne,
+	eautobuycf: Decimal.dOne,
+	eautobuyl: Decimal.dOne,
+	eautobuys: Decimal.dOne,
 
-	voidcats: new Decimal(0),
-	voidgain: new Decimal(0),
-	voidup1: new Decimal(0),
-	voidup2: new Decimal(0),
-	voidup3: new Decimal(0),
-	voidhypercats: new Decimal(0)
-}
-var time_since_last_news_message = new Decimal(0)
-var secrets = {
-
+	voidCats: Decimal.dZero,
+	voidGain: Decimal.dZero,
+	voidup1: Decimal.dZero,
+	voidup2: Decimal.dZero,
+	voidup3: Decimal.dZero,
+	voidhypercats: Decimal.dZero
 }
 
-function Export() {
-	gel("savedata").value = btoa(JSON.stringify(d))
+let timeSinceLastNewsMessage = Decimal.dZero
+
+const secrets = {
+
 }
-function Import() {
-	var data = JSON.parse(atob(document.getElementById("savedata").value))
+
+function exportSave() {
+	(gel("savedata") as HTMLTextAreaElement).value = btoa(JSON.stringify(d))
+}
+
+function importSave() {
+	const data = JSON.parse(atob((gel("savedata") as HTMLTextAreaElement).value))
 	for (const i in data) d[i] = data[i]
-	Save()
+	save()
 	location.reload()
 }
 
-function catsize(cats) {
+function getCatSize(cats: Decimal) {
 	const size_of_cat = new Decimal(11470.9448) //in cm^3/cat
 	var size_of_all_cats = size_of_cat.times(cats) // cats * cm^3/cat = cm^3
 	const density_of_cat_cm3 = new Decimal(0.00106202412) //in kg/cm^3
@@ -147,176 +202,198 @@ function catsize(cats) {
 	var p = [size_of_all_cats, weight_of_all_cats]
 	return p
 }
-function UpdateScreen() {
-	let catlimtemp = (new Decimal(1000).pow(d.catlimit)).times((new Decimal(0.85).pow(d.less_space)))
 
-	if (d.catlimit.gte(6)) { gel("buyallbutton").textContent = "Buy All" }
-	else { gel("buyallbutton").textContent = "Locked" }
-	if (d.cats.gte(new Decimal(1e3).times(new Decimal(4e2).pow(d.hypercats)))) { gel("hcbutton").textContent = "Hyper Cat Reset" }
-	else { gel("hcbutton").textContent = "You need " + formatforh(new Decimal(1e3).times(new Decimal(4e2).pow(d.hypercats))) + " Cats to (HC)Reset" }
+/**
+ * Updates the content of various HTML elements based on the values of certain variables.
+ */
+function updateElement() {
+	// Calculate catlimtemp
+	const catlimtemp = new Decimal(1000).pow(d.catLimit).times(new Decimal(0.85).pow(d.lessSpace));
 
-	if (d.voidcats.gte(new Decimal(1e5).times(new Decimal(2.25).pow(new Decimal(0.93).times(d.voidhypercats))))) { gel("hvcbutton").textContent = "Hyper Void-Cat Reset" }
-	else { gel("hvcbutton").textContent = "You need " + formatforh(new Decimal(1e5).times(new Decimal(2.25).pow(new Decimal(0.93).times(d.voidhypercats)))) + " Void Cats to (HVC)Reset" }
+	// Store repeating elements from gel into an object
 
-	if (d.cats.gte(1)) {
-		gel("catlimbar").value = d.cats.log(10).divide(catlimtemp.log(10)).mag
-		gel("catbarpercent").textContent = formatforh(d.cats.log(10).divide(catlimtemp.log(10)).times(100)) + "%"
+
+	// Update buyallbutton text content
+	elements.buyallbutton.textContent = d.catLimit.gte(6) ? "Buy All" : "Locked";
+
+	// Update hcbutton text content
+	if (d.cats.gte(new Decimal(1e3).times(new Decimal(4e2).pow(d.hyperCats)))) {
+		elements.hcbutton.textContent = "Hyper Cat Reset";
+	} else {
+		elements.hcbutton.textContent = "You need " + formatForH(new Decimal(1e3).times(new Decimal(4e2).pow(d.hyperCats))) + " Cats to (HC)Reset";
 	}
-	else { gel("catlimbar").value = 0; gel("catbarpercent").textContent = "0%" }
 
-	gel("cats").textContent = formatforh(d.cats)
-	gel("cps").textContent = formatforh(catspersecond)
-	gel("catlim").textContent = formatforh(catlimtemp)
-	gel("catsummoners").textContent = formatforz(d.cat_summoners)
-	gel("catfood").textContent = formatforz(d.cat_food)
-	gel("basecats").textContent = formatforh(d.cat_summoners.pow(d.better_magic.divide(60).plus(1)))
-	gel("catmulti").textContent = formatforh(new Decimal(1.75).pow(d.cat_food))
-	gel("cscost").textContent = formatforh(new Decimal(10).times(new Decimal(1.75).pow(d.cat_summoners)))
-	gel("cfcost").textContent = formatforh(new Decimal(25).times(new Decimal(2.05).pow(d.cat_food)))
-	gel("catlimitnum").textContent = formatforz(d.catlimit.minus(1))
-	gel("maxccs").textContent = formatforz(d.catlimit)
-	gel("ccs").textContent = formatforz(d.catlimit.minus(d.spent_cat_coins))
-	gel("ls").textContent = formatforz(d.less_space)
-	gel("bm").textContent = formatforz(d.better_magic)
-	gel("lscost").textContent = formatforz(new Decimal(1.15).pow(d.less_space).floor())
-	gel("bmcost").textContent = formatforz(new Decimal(1.25).pow(d.better_magic).floor())
-	gel("lsboost").textContent = formatforh(new Decimal(0.85).pow(d.less_space).times(100))
-	gel("bmboost").textContent = formatforh(d.better_magic.divide(60).plus(1))
-	gel("catssacrificed").textContent = formatforh(d.cat_god_sacrificed)
-	gel("sacrificedboost").textContent = formatforh(((d.cat_god_sacrificed.plus(1)).logarithm(new Decimal(5).minus(VoidUpgradeBoosts(1))).plus(1)).pow(1.01))
-	gel("hc").textContent = formatforz(d.hypercats)
-	gel("hcboost").textContent = formatforh(d.hypercats.plus(1).pow(VoidUpgradeBoosts(2)))
-	gel("timeplayed").textContent = formatTime(new Decimal(Date.now()).minus(d.startPlaying).divide(1000))
-	gel("energycats").textContent = formatforh(d.energycats)
-	gel("ecps").textContent = formatforh(d.cats.log(10))
-	gel("highcats").textContent = formatforh(d.HighCats)
-	gel("voidc").textContent = formatforh(d.voidcats)
-	gel("exenercat").textContent = formatforh(d.energycats)
-	gel("voidg").textContent = formatforh(d.energycats.log(10).times(new Decimal(1.375).pow(d.voidhypercats)
-	))
-	gel("hypervoidcats").textContent = formatforz(d.voidhypercats)
-	gel("hypervoidcatsboost").textContent = formatforh(new Decimal(1.375).pow(d.voidhypercats))
+	// Update hvcbutton text content
+	if (d.voidCats.gte(new Decimal(1e5).times(new Decimal(2.25).pow(new Decimal(0.93).times(d.voidhypercats))))) {
+		elements.hvcbutton.textContent = "Hyper Void-Cat Reset";
+	} else {
+		elements.hvcbutton.textContent = "You need " + formatForH(new Decimal(1e5).times(new Decimal(2.25).pow(new Decimal(0.93).times(d.voidhypercats)))) + " Void Cats to (HVC)Reset";
+	}
 
-	gel("voidb").textContent = formatforh(!isNaN(d.cats.log(10).mag) ? d.voidcats.plus(1).log(3).times((catlimtemp.log(10).divide(d.cats.plus(1).log(10)))).plus(1) : 1)
-	gel("catsize").textContent = format(catsize(d.cats)[0], 6)
-	gel("catweight").textContent = format(catsize(d.cats)[1], 6)
-	let percent_to_cl = isNaN(d.cats.log(10).divide(catlimtemp.log(10)).mag) ? new Decimal(0) :
-		d.cats.log(10).divide(catlimtemp.log(10))
-	gel("voidpower").textContent = formatforh(d.voidcats.pow(0.6).times(new Decimal(1).minus(percent_to_cl)))
+	// Update catlimbar and catbarpercent elements
+	if (d.cats.gte(1)) {
+		const catlimbarValue = d.cats.log(10).divide(catlimtemp.log(10)).mag;
+		elements.catlimbar.value = catlimbarValue;
+		elements.catbarpercent.textContent = formatForH(d.cats.log(10).divide(catlimtemp.log(10)).times(100)) + "%";
+	} else {
+		elements.catlimbar.value = 0;
+		elements.catbarpercent.textContent = "0%";
+	}
 
-	gel("catlimitboost").textContent = d.voidup3.lt(1) ? "" : "Boost: *" + format((((new Decimal(1.05).plus(VoidUpgradeBoosts(3))).pow(d.catlimit.minus(1)))), 3) + " More Cats"
+	// Update other elements
+	elements.cats.textContent = formatForH(d.cats);
+	elements.cps.textContent = formatForH(catsPerSecond);
+	elements.catlim.textContent = formatForH(catlimtemp);
+	elements.catsummoners.textContent = formatForZ(d.catSummoners);
+	elements.catfood.textContent = formatForZ(d.catFood);
+	elements.basecats.textContent = formatForH(d.catSummoners.pow(d.betterMagic.divide(60).plus(1)));
+	elements.catmulti.textContent = formatForH(new Decimal(1.75).pow(d.catFood));
+	elements.cscost.textContent = formatForH(new Decimal(10).times(new Decimal(1.75).pow(d.catSummoners)));
+	elements.cfcost.textContent = formatForH(new Decimal(25).times(new Decimal(2.05).pow(d.catFood)));
+	elements.catlimitnum.textContent = formatForZ(d.catLimit.minus(1));
+	elements.maxccs.textContent = formatForZ(d.catLimit);
+	elements.ccs.textContent = formatForZ(d.catLimit.minus(d.spentCatCoins));
+	elements.ls.textContent = formatForZ(d.lessSpace);
+	elements.bm.textContent = formatForZ(d.betterMagic);
+	elements.lscost.textContent = formatForZ(new Decimal(1.15).pow(d.lessSpace).floor());
+	elements.bmcost.textContent = formatForZ(new Decimal(1.25).pow(d.betterMagic).floor());
+	elements.lsboost.textContent = formatForH(new Decimal(0.85).pow(d.lessSpace).times(100));
+	elements.bmboost.textContent = formatForH(d.betterMagic.divide(60).plus(1));
+	elements.catssacrificed.textContent = formatForH(d.catGodSacrificed);
+	elements.sacrificedboost.textContent = formatForH(((d.catGodSacrificed.plus(1)).logarithm(new Decimal(5).minus(voidUpgradeBoosts(1))).plus(1)).pow(1.01));
+	elements.hc.textContent = formatForZ(d.hyperCats);
+	elements.hcboost.textContent = formatForH(d.hyperCats.plus(1).pow(voidUpgradeBoosts(2)));
+	elements.timeplayed.textContent = formatTime(new Decimal(Date.now()).minus(d.startPlaying).divide(1000));
+	elements.energycats.textContent = formatForH(d.energyCats);
+	elements.ecps.textContent = formatForH(d.cats.log(10));
+	elements.highcats.textContent = formatForH(d.highCats);
+	elements.voidc.textContent = formatForH(d.voidCats);
+	elements.exenercat.textContent = formatForH(d.energyCats);
+	elements.voidg.textContent = formatForH(d.energyCats.log(10).times(new Decimal(1.375).pow(d.voidhypercats)));
+	elements.hypervoidcats.textContent = formatForZ(d.voidhypercats);
+	elements.hypervoidcatsboost.textContent = formatForH(new Decimal(1.375).pow(d.voidhypercats));
+	elements.voidb.textContent = formatForH(!isNaN(d.cats.log(10).mag) ? d.voidCats.plus(1).log(3).times((catlimtemp.log(10).divide(d.cats.plus(1).log(10)))).plus(1) : 1);
+	elements.catsize.textContent = format(getCatSize(d.cats)[0], 6);
+	elements.catweight.textContent = format(getCatSize(d.cats)[1], 6);
+	const percent_to_cl = isNaN(d.cats.log(10).divide(catlimtemp.log(10)).mag) ? Decimal.dZero : d.cats.log(10).divide(catlimtemp.log(10));
+	elements.voidpower.textContent = formatForH(d.voidCats.pow(0.6).times(Decimal.dOne.minus(percent_to_cl)));
+	elements.catlimitboost.textContent = d.voidup3.lt(1) ? "" : "Boost: *" + format((((new Decimal(1.05).plus(voidUpgradeBoosts(3))).pow(d.catLimit.minus(1)))), 3) + " More Cats";
+	elements.catgodvboost.textContent = format(voidUpgradeBoosts(1)!, 4);
+	elements.hypercatvboost.textContent = format(voidUpgradeBoosts(2)!, 4);
+	elements.catlimitvboost.textContent = format(voidUpgradeBoosts(3)!, 4);
+	elements.csas.textContent = d.eautobuycs.gte(1) ? "ON" : "OFF";
+	elements.cfas.textContent = d.eautobuycf.gte(1) ? "ON" : "OFF";
+	elements.las.textContent = d.eautobuyl.gte(1) ? "ON" : "OFF";
+}
+gel("sas").textContent = d.eautobuys.gte(1) ? "ON" : "OFF";
+gel("voidup1").className = d.voidup1.gte(1) ? "vu1button" : "vu0button";
+gel("voidup2").className = d.voidup2.gte(1) ? "vu1button" : "vu0button";
+gel("voidup3").className = d.voidup3.gte(1) ? "vu1button" : "vu0button";
 
-	gel("catgodvboost").textContent = format(VoidUpgradeBoosts(1), 4)
-	gel("hypercatvboost").textContent = format(VoidUpgradeBoosts(2), 4)
-	gel("catlimitvboost").textContent = format(VoidUpgradeBoosts(3), 4)
-
-	gel("csas").textContent = d.eautobuycs.gte(1) ? "ON" : "OFF"
-	gel("cfas").textContent = d.eautobuycf.gte(1) ? "ON" : "OFF"
-	gel("las").textContent = d.eautobuyl.gte(1) ? "ON" : "OFF"
-	gel("sas").textContent = d.eautobuys.gte(1) ? "ON" : "OFF"
-
-	gel("voidup1").className = d.voidup1.gte(1) ? "vu1button" : "vu0button"
-	gel("voidup2").className = d.voidup2.gte(1) ? "vu1button" : "vu0button"
-	gel("voidup3").className = d.voidup3.gte(1) ? "vu1button" : "vu0button"
-
-	const emprefix = ["csa", "cfa", "ear", "as"]
-	const emvalues = [10000, 75000, 50000, 100000]
-	for (let i = 0; i < 4; i++) {
-		gel(emprefix[i] + "em").textContent = d.energycats.gte(emvalues[i]) ? "Unlocked (" + formatforh(emvalues[i]) + " EC)" : formatforh(new Decimal(emvalues[i]).minus(d.energycats)) + " ECs left (" + formatforh(emvalues[i]) + " Required)"
+// Update energy cat elements
+const emprefix = ["csa", "cfa", "ear", "as"];
+const emvalues = [10000, 75000, 50000, 100000];
+for (let i = 0; i < 4; i++) {
+	const emElement = gel(emprefix[i] + "em");
+	if (d.energyCats.gte(emvalues[i])) {
+		emElement.textContent = "Unlocked (" + formatForH(emvalues[i]) + " EC)";
+	} else {
+		emElement.textContent = formatForH(new Decimal(emvalues[i]).minus(d.energyCats)) + " ECs left (" + formatForH(emvalues[i]) + " Required)";
 	}
 }
 
 /* x: index, i: tab */
 function BuyItem(x, i) {
-	var catcoins = d.catlimit.minus(d.spent_cat_coins)
+	var catcoins = d.catLimit.minus(d.spentCatCoins)
 	if (i == 1) {
-		if (x == 1 && d.cats.greaterThanOrEqualTo(new Decimal(10).times(new Decimal(1.75).pow(d.cat_summoners)))) {
-			d.cats = d.cats.minus(new Decimal(10).times(new Decimal(1.75).pow(d.cat_summoners)))
-			d.cat_summoners = d.cat_summoners.plus(1)
+		if (x == 1 && d.cats.greaterThanOrEqualTo(new Decimal(10).times(new Decimal(1.75).pow(d.catSummoners)))) {
+			d.cats = d.cats.minus(new Decimal(10).times(new Decimal(1.75).pow(d.catSummoners)))
+			d.catSummoners = d.catSummoners.plus(1)
 		}
-		if (x == 2 && d.cats.greaterThanOrEqualTo(new Decimal(25).times(new Decimal(2.05).pow(d.cat_food)))) {
-			d.cats = d.cats.minus(new Decimal(25).times(new Decimal(2.05).pow(d.cat_food)))
-			d.cat_food = d.cat_food.plus(1)
+		if (x == 2 && d.cats.greaterThanOrEqualTo(new Decimal(25).times(new Decimal(2.05).pow(d.catFood)))) {
+			d.cats = d.cats.minus(new Decimal(25).times(new Decimal(2.05).pow(d.catFood)))
+			d.catFood = d.catFood.plus(1)
 		}
 	}
 
 	if (i == 2) {
-		if (x == 1 && catcoins.greaterThanOrEqualTo(new Decimal(1.15).pow(d.less_space).floor())) {
-			d.spent_cat_coins = d.spent_cat_coins.add(new Decimal(1.15).pow(d.less_space).floor())
-			d.less_space = d.less_space.add(1)
+		if (x == 1 && catcoins.greaterThanOrEqualTo(new Decimal(1.15).pow(d.lessSpace).floor())) {
+			d.spentCatCoins = d.spentCatCoins.add(new Decimal(1.15).pow(d.lessSpace).floor())
+			d.lessSpace = d.lessSpace.add(1)
 		}
-		if (x == 2 && catcoins.greaterThanOrEqualTo(new Decimal(1.25).pow(d.better_magic).floor())) {
-			d.spent_cat_coins = d.spent_cat_coins.plus(new Decimal(1.25).pow(d.better_magic).floor())
-			d.better_magic = d.better_magic.add(1)
+		if (x == 2 && catcoins.greaterThanOrEqualTo(new Decimal(1.25).pow(d.betterMagic).floor())) {
+			d.spentCatCoins = d.spentCatCoins.plus(new Decimal(1.25).pow(d.betterMagic).floor())
+			d.betterMagic = d.betterMagic.add(1)
 		}
 	}
 	if (i == 3) {
-		if (x == 1 && !d.voidup1.eq(1) && d.cat_god_sacrificed.gte(1e30)) {
-			d.voidup1 = new Decimal(1)
+		if (x == 1 && !d.voidup1.eq(1) && d.catGodSacrificed.gte(1e30)) {
+			d.voidup1 = Decimal.dOne
 		}
-		if (x == 2 && !d.voidup2.eq(1) && d.hypercats.gte(10)) {
-			d.voidup2 = new Decimal(1)
+		if (x == 2 && !d.voidup2.eq(1) && d.hyperCats.gte(10)) {
+			d.voidup2 = Decimal.dOne
 		}
 		if (x == 3 && !d.voidup3.eq(1) && d.cats.gte(1e35)) {
-			d.voidup3 = new Decimal(1)
+			d.voidup3 = Decimal.dOne
 		}
 	}
 }
-function VoidUpgradeBoosts(x) {
-	let catlimtemp = (new Decimal(1000).pow(d.catlimit)).times((new Decimal(0.85).pow(d.less_space)))
-	let percent_to_cl = isNaN(d.cats.log(10).divide(catlimtemp.log(10)).mag) ? new Decimal(0) :
+function voidUpgradeBoosts(x: Decimal | number) {
+	const catlimtemp = (new Decimal(1000).pow(d.catLimit)).times((new Decimal(0.85).pow(d.lessSpace)))
+	const percent_to_cl = isNaN(d.cats.log(10).divide(catlimtemp.log(10)).mag) ? Decimal.dZero :
 		d.cats.log(10).divide(catlimtemp.log(10))
-	let voidenergy = d.voidcats.pow(0.6).times(new Decimal(1).minus(percent_to_cl))
+	const voidenergy = d.voidCats.pow(0.6).times(Decimal.dOne.minus(percent_to_cl))
 	if (x == 1) {
 		if (d.voidup1.lt(1)) {
-			return new Decimal(0)
+			return Decimal.dZero
 		}
 		else {
-			return (new Decimal(1).divide(new Decimal(-0.00015).times(voidenergy.plus(5000)))).plus(2)
+			return (Decimal.dOne.divide(new Decimal(-0.00015).times(voidenergy.plus(5000)))).plus(2)
 		}
 	}
 	if (x == 2) {
 		if (d.voidup2.lt(1)) {
-			return new Decimal(1)
+			return Decimal.dOne
 		}
 		else {
-			return (new Decimal(1).divide(new Decimal(-0.00022).times(voidenergy.plus(2280)))).plus(2).divide(2).plus(1)
+			return (Decimal.dOne.divide(new Decimal(-0.00022).times(voidenergy.plus(2280)))).plus(2).divide(2).plus(1)
 		}
 	}
 	if (x == 3) {
 		if (d.voidup3.lt(1)) {
-			return new Decimal(0)
+			return Decimal.dZero
 		}
 		else {
 			return voidenergy.divide(10000)
 		}
 	}
+	return Decimal.dZero
 }
 function EnergyMilestone() {
-	if (d.energycats.gte(0)) {
-		d.energycatmilestone = new Decimal(0)
+	if (d.energyCats.gte(0)) {
+		d.energyCatMilestone = Decimal.dZero
 	}
-	if (d.energycats.gte(10000)) {
-		d.energycatmilestone = new Decimal(1)
+	if (d.energyCats.gte(10000)) {
+		d.energyCatMilestone = Decimal.dOne
 	}
-	if (d.energycats.gte(50000)) {
-		d.energycatmilestone = new Decimal(2)
+	if (d.energyCats.gte(50000)) {
+		d.energyCatMilestone = Decimal.dTwo
 	}
-	if (d.energycats.gte(75000)) {
-		d.energycatmilestone = new Decimal(3)
+	if (d.energyCats.gte(75000)) {
+		d.energyCatMilestone = new Decimal(3)
 	}
-	if (d.energycats.gte(100000)) {
-		d.energycatmilestone = new Decimal(4)
+	if (d.energyCats.gte(100000)) {
+		d.energyCatMilestone = new Decimal(4)
 	}
 }
-function Save() { localStorage.setItem("catgame-save", btoa(JSON.stringify(d))); localStorage.setItem("catgame-secrets", btoa(JSON.stringify(secrets))) }
+function save() { localStorage.setItem("catgame-save", btoa(JSON.stringify(d))); localStorage.setItem("catgame-secrets", btoa(JSON.stringify(secrets))) }
 function Load() {
 	if (localStorage.getItem("catgame-save") != null) {
-		var data = JSON.parse(atob(localStorage.getItem("catgame-save")))
+		var data = JSON.parse(atob(localStorage.getItem("catgame-save") ?? ""))
 		for (const i in data) d[i] = new Decimal(data[i])
 	};
 	if (localStorage.getItem("catgame-secrets") != null) {
-		var data = JSON.parse(atob(localStorage.getItem("catgame-secrets")))
+		var data = JSON.parse(atob(localStorage.getItem("catgame-secrets") ?? ""))
 		for (const i in data) secrets[i] = new Decimal(data[i]);
 	}
 }
@@ -356,9 +433,9 @@ function Tabs() {
 	if (tab == "hyperspecificats") {
 		gel("hyperspecificats").style.display = "inline";
 		gel("hyperspecificcats").textContent = format(d.cats, 12)
-		gel("hyperspecifichighcats").textContent = format(d.HighCats, 12)
-		gel("hyperspecificcatsize").textContent = format(catsize(d.cats)[0], 12)
-		gel("hyperspecificcatweight").textContent = format(catsize(d.cats)[1], 12)
+		gel("hyperspecifichighcats").textContent = format(d.highCats, 12)
+		gel("hyperspecificcatsize").textContent = format(getCatSize(d.cats)[0], 12)
+		gel("hyperspecificcatweight").textContent = format(getCatSize(d.cats)[1], 12)
 	}
 	else { gel("hyperspecificats").style.display = "none"; }
 	//dogs^4
@@ -369,45 +446,45 @@ function Tabs() {
 	else { gel("stupidoptionslol").style.display = "none"; }
 	//??????
 
-	if ((d.voidcats.gte(100000) || d.voidhypercats.gte(1)) && d.catlimit.gte(11)) {
-		gel("voidhypercatstuff").disabled = false;
-		gel("voidhypercatstuff").style = "visibility: visible";
-	} else {
-		gel("voidhypercatstuff").disabled = true;
-		gel("voidhypercatstuff").style = "visibility: hidden";
-	}
+	// if ((d.voidCats.gte(100000) || d.voidhypercats.gte(1)) && d.catLimit.gte(11)) {
+	// 	elements.voidhypercatstuff.disabled = false;
+	// 	elements.voidhypercatstuff.style = "visibility: visible";
+	// } else {
+	// 	elements.voidhypercatstuff.disabled = true;
+	// 	elements.voidhypercatstuff.style = "visibility: hidden";
+	// }
 
-	gel("overlay").style.display = d.voidgain.gte(1) ? "inline" : "none"
+	gel("overlay").style.display = d.voidGain.gte(1) ? "inline" : "none"
 
-	if (d.cats.greaterThanOrEqualTo(999) || d.catlimit.greaterThanOrEqualTo(2)) { gel("catlimbutton").style.display = "inline"; }
+	if (d.cats.greaterThanOrEqualTo(999) || d.catLimit.greaterThanOrEqualTo(2)) { gel("catlimbutton").style.display = "inline"; }
 	else { gel("catlimbutton").style.display = "none"; }
-	if (d.catlimit.greaterThanOrEqualTo(2)) { gel("catcoinbutton").style.display = "inline"; }
+	if (d.catLimit.greaterThanOrEqualTo(2)) { gel("catcoinbutton").style.display = "inline"; }
 	else { gel("catcoinbutton").style.display = "none"; }
-	if (d.catlimit.greaterThanOrEqualTo(4)) { gel("catgodbutton").style.display = "inline"; }
+	if (d.catLimit.greaterThanOrEqualTo(4)) { gel("catgodbutton").style.display = "inline"; }
 	else { gel("catgodbutton").style.display = "none"; }
-	if (d.catlimit.greaterThanOrEqualTo(7)) { gel("hypercatsbutton").style.display = "inline"; }
+	if (d.catLimit.greaterThanOrEqualTo(7)) { gel("hypercatsbutton").style.display = "inline"; }
 	else { gel("hypercatsbutton").style.display = "none"; }
-	if (d.catlimit.greaterThanOrEqualTo(8)) { gel("energybutton").style.display = "inline"; }
+	if (d.catLimit.greaterThanOrEqualTo(8)) { gel("energybutton").style.display = "inline"; }
 	else { gel("energybutton").style.display = "none"; }
-	if (d.catlimit.greaterThanOrEqualTo(11)) { gel("voidbutton").style.display = "inline"; }
+	if (d.catLimit.greaterThanOrEqualTo(11)) { gel("voidbutton").style.display = "inline"; }
 	else { gel("voidbutton").style.display = "none"; }
 }
 function CatGodSacrifice() {
 	var p = d.cats
-	if (d.cat_summoners.gte(1)) {
-		d.cats = new Decimal(0)
-		d.cat_god_sacrificed = d.cat_god_sacrificed.plus(p)
+	if (d.catSummoners.gte(1)) {
+		d.cats = Decimal.dZero
+		d.catGodSacrificed = d.catGodSacrificed.plus(p)
 	}
 }
 function HyperCatsReset(multicat) {
 	const mulcat = new Decimal(multicat)
 	if (mulcat.gte(1)) { }
 	else {
-		if (d.cats.gte(new Decimal(1e3).times(new Decimal(4e2).pow(d.hypercats)))) {
+		if (d.cats.gte(new Decimal(1e3).times(new Decimal(4e2).pow(d.hyperCats)))) {
 			d.cats = new Decimal(11)
-			d.cat_summoners = new Decimal(0)
-			d.cat_food = new Decimal(0)
-			d.hypercats = d.hypercats.plus(1)
+			d.catSummoners = Decimal.dZero
+			d.catFood = Decimal.dZero
+			d.hyperCats = d.hyperCats.plus(1)
 		}
 	}
 }
@@ -415,27 +492,27 @@ function VHyperCatsReset(multicat) {
 	const mulcat = new Decimal(multicat)
 	if (mulcat.gte(1)) { }
 	else {
-		if (d.voidcats.gte(new Decimal(1e5).times(new Decimal(2.25).pow(new Decimal(0.93).times(d.voidhypercats))))) {
-			d.voidcats = new Decimal(1e5).times(new Decimal(2.25).pow(new Decimal(0.93).times(d.voidhypercats)))
+		if (d.voidCats.gte(new Decimal(1e5).times(new Decimal(2.25).pow(new Decimal(0.93).times(d.voidhypercats))))) {
+			d.voidCats = new Decimal(1e5).times(new Decimal(2.25).pow(new Decimal(0.93).times(d.voidhypercats)))
 			d.voidhypercats = d.voidhypercats.plus(1)
 		}
 	}
 }
 function CatLimReset(force = 0) {
-	let catlimtemp = (new Decimal(1000).pow(d.catlimit)).times((new Decimal(0.85).pow(d.less_space)))
+	let catlimtemp = (new Decimal(1000).pow(d.catLimit)).times((new Decimal(0.85).pow(d.lessSpace)))
 	if (d.cats.greaterThanOrEqualTo(catlimtemp) || force == 1) {
 		d.cats = new Decimal(11)
-		if (force == 0) { d.catlimit = d.catlimit.plus(1) }
-		d.cat_summoners = new Decimal(0)
-		d.cat_food = new Decimal(0)
-		d.cat_god_sacrificed = new Decimal(0)
-		d.hypercats = new Decimal(0)
-		d.energycats = new Decimal(0)
+		if (force == 0) { d.catLimit = d.catLimit.plus(1) }
+		d.catSummoners = Decimal.dZero
+		d.catFood = Decimal.dZero
+		d.catGodSacrificed = Decimal.dZero
+		d.hyperCats = Decimal.dZero
+		d.energyCats = Decimal.dZero
 	}
 }
 function BuyAll() {
-	if (d.catlimit.gte(6)) {
-		while (d.cats.greaterThanOrEqualTo(new Decimal(10).times(new Decimal(1.75).pow(d.cat_summoners))) || d.cats.greaterThanOrEqualTo(new Decimal(25).times(new Decimal(2.05).pow(d.cat_food)))) {
+	if (d.catLimit.gte(6)) {
+		while (d.cats.greaterThanOrEqualTo(new Decimal(10).times(new Decimal(1.75).pow(d.catSummoners))) || d.cats.greaterThanOrEqualTo(new Decimal(25).times(new Decimal(2.05).pow(d.catFood)))) {
 			BuyItem(2, 1); BuyItem(1, 1);
 		}
 	}
@@ -443,9 +520,9 @@ function BuyAll() {
 function Respec(x) {
 	if (x == 1) {
 		if (confirm("Are you sure? you will regain all your Cat Coins, but you will have to retry the CL!")) {
-			d.spent_cat_coins = new Decimal(0)
-			d.less_space = new Decimal(0)
-			d.better_magic = new Decimal(0)
+			d.spentCatCoins = Decimal.dZero
+			d.lessSpace = Decimal.dZero
+			d.betterMagic = Decimal.dZero
 			CatLimReset(1)
 		}
 	}
@@ -460,7 +537,7 @@ function VerifyCode(code) {
 			HardReset()
 			break
 		case "dogsdogsdogsdogs":
-			d.cats = new Decimal(0)
+			d.cats = Decimal.dZero
 			tab = "dogsdogsdogsdogs"
 			break
 		case "mewwhenthecatsdo":
@@ -478,68 +555,70 @@ function VerifyCode(code) {
 			break
 		default:
 			alert("Invalid code")
-	} gel("secretpasses").value = "";
+	} elements.secretpasses.value = "";
 }
 Load()
 gel("newsticker").textContent = newsfile[Math.floor(Math.random() * (newsfile.length - 1))]
-setInterval(() => { Save() }, 10000)
+setInterval(() => { save() }, 10000)
 setInterval(() => {
-	let catlimtemp = (new Decimal(1000).pow(d.catlimit)).times((new Decimal(0.85).pow(d.less_space)))
-	if (d.cats.gte(d.HighCats)) { d.HighCats = d.cats }
+	let catlimtemp = (new Decimal(1000).pow(d.catLimit)).times((new Decimal(0.85).pow(d.lessSpace)))
+	if (d.cats.gte(d.highCats)) { d.highCats = d.cats }
 	let dt = (new Decimal(Date.now()).minus(d.lastTick).divide(1000))
-	deltatime = (new Decimal(Date.now()).minus(d.lastTick).divide(1000))
+	// deltatime = (new Decimal(Date.now()).minus(d.lastTick).divide(1000))
 	d.lastTick = new Decimal(Date.now());
-	document.title = formatforh(d.cats) + " Cats | CatGame"
+	document.title = formatForH(d.cats) + " Cats | CatGame"
 	Tabs()
 
 	// CS^((cc.BM/60)+1)*(1.75^CF)
-	let base_cps = (d.cat_summoners.pow(d.better_magic.divide(60).plus(1))).times(new Decimal(1.75).pow(d.cat_food))
+	let base_cps = (d.catSummoners.pow(d.betterMagic.divide(60).plus(1))).times(new Decimal(1.75).pow(d.catFood))
 
 	//1.05^CL
-	let catlimit_boost = ((new Decimal(1.05).plus(VoidUpgradeBoosts(3))).pow(d.catlimit.minus(1)))
+	let catlimit_boost = ((new Decimal(1.05).plus(voidUpgradeBoosts(3))).pow(d.catLimit.minus(1)))
 
 	//(log5(cg.SA+1)+1)^1.01
-	let catgod_boost = ((d.cat_god_sacrificed.plus(1)).logarithm(new Decimal(5).minus(VoidUpgradeBoosts(1))).plus(1)).pow(1.01)
-	let hypercat_boost = d.hypercats.plus(1).pow(VoidUpgradeBoosts(2))
+	let catgod_boost = ((d.catGodSacrificed.plus(1)).logarithm(new Decimal(5).minus(voidUpgradeBoosts(1))).plus(1)).pow(1.01)
+	let hypercat_boost = d.hyperCats.plus(1).pow(voidUpgradeBoosts(2))
 
 	// log3(VC+1)*(log10(CL.v)/(log10(cats+1))+1 if >1 or not undefined, else 1
-	let void_boost = !isNaN(d.voidcats.plus(1).log(3).times((catlimtemp.log(10).divide(d.cats.plus(1).log(10)))).plus(1)) && d.voidcats.plus(1).log(3).times((catlimtemp.log(10).divide(d.cats.plus(1).log(10)))).plus(1).gte(1) ? d.voidcats.plus(1).log(3).times((catlimtemp.log(10).divide(d.cats.plus(1).log(10)))).plus(1) : 1
+	let void_boost = !Decimal.isNaN(d.voidCats.plus(1).log(3).times((catlimtemp.log(10).divide(d.cats.plus(1).log(10)))).plus(1)) && d.voidCats.plus(1).log(3).times((catlimtemp.log(10).divide(d.cats.plus(1).log(10)))).plus(1).gte(1) ? d.voidCats.plus(1).log(3).times((catlimtemp.log(10).divide(d.cats.plus(1).log(10)))).plus(1) : 1
 
-	catspersecond = base_cps.times(catlimit_boost).times(catgod_boost).times(hypercat_boost).times(void_boost)
+	catsPerSecond = base_cps.times(catlimit_boost).times(catgod_boost).times(hypercat_boost).times(void_boost)
 
-	UpdateScreen()
+	updateElement()
 
-	if (d.catlimit.greaterThanOrEqualTo(8) && !isNaN(d.cats.log(10).mag) && !d.voidgain.gte(1)) { d.energycats = d.energycats.plus(d.cats.log(10).times(dt)) }
+	if (d.catLimit.greaterThanOrEqualTo(8) && !isNaN(d.cats.log(10).mag) && !d.voidGain.gte(1)) { d.energyCats = d.energyCats.plus(d.cats.log(10).times(dt)) }
 
-	if (d.catlimit.greaterThanOrEqualTo(11) && !isNaN(d.energycats.log(10).mag) && d.voidgain.gte(1)) {
-		d.voidcats = d.voidcats.plus((d.energycats.log(10).times(new Decimal(1.375).pow(d.voidhypercats)
+	if (d.catLimit.greaterThanOrEqualTo(11) && !isNaN(d.energyCats.log(10).mag) && d.voidGain.gte(1)) {
+		d.voidCats = d.voidCats.plus((d.energyCats.log(10).times(new Decimal(1.375).pow(d.voidhypercats)
 		)).mul(dt))
 	}
 
-	d.cats = d.cats.plus(catspersecond.mul(dt))
+	d.cats = d.cats.plus(catsPerSecond.mul(dt))
 
 	if (d.cats.greaterThanOrEqualTo(catlimtemp)) { d.cats = catlimtemp }
-	if (d.catlimit.greaterThanOrEqualTo(8)) {
+	if (d.catLimit.greaterThanOrEqualTo(8)) {
 		EnergyMilestone()
-		if (d.energycatmilestone.gte(4) && d.eautobuys.gte(1) && !d.voidgain.gte(1)) {
-			d.cat_god_sacrificed = d.cat_god_sacrificed.plus(d.cats.divide(20).mul(dt))
+		if (d.energyCatMilestone.gte(4) && d.eautobuys.gte(1) && !d.voidGain.gte(1)) {
+			d.catGodSacrificed = d.catGodSacrificed.plus(d.cats.divide(20).mul(dt))
 		}
-		if (d.energycatmilestone.gte(2) && d.eautobuyl.gte(1) && !d.voidgain.gte(1)) {
+		if (d.energyCatMilestone.gte(2) && d.eautobuyl.gte(1) && !d.voidGain.gte(1)) {
 			CatLimReset(0)
 		}
-		if (d.energycatmilestone.gte(3) && d.eautobuycf.gte(1) && !d.voidgain.gte(1)) {
+		if (d.energyCatMilestone.gte(3) && d.eautobuycf.gte(1) && !d.voidGain.gte(1)) {
 			BuyItem(2, 1)
 		}
-		if (d.energycatmilestone.gte(1) && d.eautobuycs.gte(1) && !d.voidgain.gte(1)) {
+		if (d.energyCatMilestone.gte(1) && d.eautobuycs.gte(1) && !d.voidGain.gte(1)) {
 			BuyItem(1, 1)
 		}
 	}
-	if (tab == "dogsdogsdogsdogs") { d.cats = new Decimal(0) }
+	if (tab == "dogsdogsdogsdogs") { d.cats = Decimal.dZero }
 
-	time_since_last_news_message = time_since_last_news_message.add(dt)
-	if (time_since_last_news_message.gte(10)) {
+	timeSinceLastNewsMessage = timeSinceLastNewsMessage.add(dt)
+	if (timeSinceLastNewsMessage.gte(10)) {
 		console.log(newsfile[Math.floor(Math.random() * (newsfile.length - 1))])
 		gel("newsticker").textContent = newsfile[Math.floor(Math.random() * (newsfile.length - 1))]
-		time_since_last_news_message = new Decimal(0)
+		timeSinceLastNewsMessage = Decimal.dZero
 	}
 }, 1000 / 100)
+
+VerifyCode(elements.secretpasses.value)
