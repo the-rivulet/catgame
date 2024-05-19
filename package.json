@@ -4,7 +4,10 @@
 	"description": "a silly game about cats",
 	"main": "null",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "vite build",
+		"preview": "vite preview",
+		"dev": "vite"
 	},
 	"author": "frinkifail, teste and catgame dev team",
 	"license": "ISC",
