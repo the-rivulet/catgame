@@ -11,23 +11,23 @@
   "tasks": {
     "test": {
       "name": "test",
-      "command": "npm run test",
-      "runAtStart": false
+      "command": "npm run test"
     },
     "build": {
       "name": "build",
-      "command": "npm run build",
-      "runAtStart": false
+      "command": "npm run build"
     },
     "preview": {
       "name": "preview",
-      "command": "npm run preview",
-      "runAtStart": false
+      "command": "npm run preview"
     },
     "dev": {
       "name": "dev",
       "command": "npm run dev",
-      "runAtStart": true
+      "runAtStart": true,
+      "preview": {
+        "port": 5173
+      }
     }
   }
 }
