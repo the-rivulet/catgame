@@ -8,7 +8,8 @@
 	<meta property="og:title" content="CatGame">
 	<meta property="og:description" content="get cat">
 	<title>Cat Game</title>
-	<link href="dark.css" rel="stylesheet" type="text/css" />
+	<link href="dark.css" rel="stylesheet" />
+	<link href="frinkis.css" rel="stylesheet" />
 	<link rel="icon" type="image/x-icon"
 		href="https://cdn.glitch.global/1be1d1e2-9728-453c-8f0d-285db27f9993/catgamelogo.png?v=1694041923462" />
 
@@ -16,13 +17,16 @@
 
 <body>
 	<div id="debug">
-		<p>MSPT: <span id="mspt"></span></p>
+		<h4>Performance</h4>
+		<p>Target MSPT: <span id="target-mspt"></span>ms</p>
+		<p>MSPT: <span id="mspt"></span>ms</p>
+		<p>Average MSPT: <span id="avg-mspt"></span>ms</p>
 	</div>
 	<div id="overlay"></div>
 	<div id="loafing">
 		Loafing...<br>
 	</div>
-	<div style="position: sticky; top: 0px; background-color: #222222;">
+	<div style="position: sticky; top: 0px;">
 		<p id="newstickernomar">
 			<span id="newsticker">
 				newsticker
