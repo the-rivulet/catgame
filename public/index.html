@@ -61,20 +61,20 @@
 		<table align="center">
 			<tr>
 				<td></td>
-				<td><button class="button" id="buyall" onclick="BuyAll()"><b><span id="buyallbutton">Buy All
+				<td><button class="button" id="buyall"><b><span id="buyallbutton">Buy All
 								(CL5)</span></b></button></td>
 			</tr>
 			<tr>
 				<td>(<span id="catsummoners"></span>)</td>
 				<td>Cat Summoner</td>
-				<td><button class="button" onclick="BuyItem(1,1)">Buy for <span id="cscost"></span> <span
+				<td><button class="button" id="buy11">Buy for <span id="cscost"></span> <span
 							class="main">Cats</span></button></td>
 				<td><span id="basecats"></span> Base <span class="main">Cats</span>/s</td>
 			</tr>
 			<tr>
 				<td>(<span id="catfood"></span>)</td>
 				<td>Cat Food</td>
-				<td><button class="button" onclick="BuyItem(2,1)">Buy for <span id="cfcost"></span> <span
+				<td><button class="button" id="buy21">Buy for <span id="cfcost"></span> <span
 							class="main">Cats</span></button></td>
 				<td>*<span id="catmulti"></span> <span class="main">Cats</span>/s</td>
 			</tr>
@@ -82,7 +82,7 @@
 	</span>
 	<span id="catlimit">
 		<h2 class="blue">You are at CL<span id="catlimitnum"></span></h2>
-		<button class="button" onclick="CatLimReset()">Reset for Cat Limit Increase</button><br>
+		<button class="button" id="limreset">Reset for Cat Limit Increase</button><br>
 		<span id="catlimitboost" class="blue">lol</span>
 	</span>
 	<span id="catcoins">
@@ -92,14 +92,14 @@
 			<tr>
 				<td>(<span id="ls"></span>)</td>
 				<td>Less Space</td>
-				<td><button class="button" onclick="BuyItem(1,2)">Buy for <span id="lscost"></span> Cat Coins</button>
+				<td><button class="button" id="buy12">Buy for <span id="lscost"></span> Cat Coins</button>
 				</td>
 				<td><span id="lsboost"></span>% <span class="blue">Cat Limit</span></td>
 			</tr>
 			<tr>
 				<td>(<span id="bm"></span>)</td>
 				<td>Better Magic</td>
-				<td><button class="button" onclick="BuyItem(2,2)">buy for <span id="bmcost"></span> Cat Coins</button>
+				<td><button class="button" id="buy22">buy for <span id="bmcost"></span> Cat Coins</button>
 				</td>
 				<td>^<span id="bmboost"></span> to <span class="main">Cat Summoners</span></td>
 			</tr>
@@ -265,6 +265,6 @@
 		<button class="button" onclick="d.cats = d.cats">Always Power Outage</button><br>
 		<!-- exit --><br><button onclick="tab = 'options'" class="button">Return to Options</button>
 	</span>
-	<script type="text/javascript" src="js/main.js" type="module"></script>
+	<script type=module type="text/javascript" src="js/main.js"></script>
 </body>
 </html>

@@ -4,6 +4,7 @@ import { TPS, resetCatLimit, currentTab, data, energyMilestone, load, newsfile, 
 import { catsPerSecond, timeSinceLastNewsMessage, updateElement, updateTabs } from './render.js';
 import { exportSave, gel, importSave } from './utils.js';
 import { formatForH } from './format.js';
+import { buyAll, catLimitReset } from './script.js';
 alert("a");
 let avgmsptTimer = 0;
 const avgmspt: Array<number> = [];
@@ -15,6 +16,14 @@ function initializeGame() {
     setInterval(() => {
         save();
     }, 10000);
+
+    // Register onclicks
+    gel("buy11").onclick = () => buyItem(1, 1);
+    gel("buy21").onclick = () => buyItem(2, 1);
+    gel("buy12").onclick = () => buyItem(1, 2);
+    gel("buy22").onclick = () => buyItem(2, 2);
+    gel("buyall").onclick = () => buyAll();
+    gel("limreset").onclick = () => catLimitReset();
 
     setInterval(gameLoop, 1000 / TPS);
 }

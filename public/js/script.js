@@ -556,7 +556,7 @@ function vHyperCatsReset(multicat) {
         }
     }
 }
-function catLimitReset(force = 0) {
+export function catLimitReset(force = 0) {
     let catlimtemp = new Decimal(1000)
         .pow(data.catLimit)
         .times(new Decimal(0.85).pow(data.lessSpace));
@@ -572,7 +572,7 @@ function catLimitReset(force = 0) {
         data.energyCats = Decimal.dZero;
     }
 }
-function buyAll() {
+export function buyAll() {
     if (data.catLimit.gte(6)) {
         while (data.cats.greaterThanOrEqualTo(new Decimal(10).times(new Decimal(1.75).pow(data.catSummoners))) ||
             data.cats.greaterThanOrEqualTo(new Decimal(25).times(new Decimal(2.05).pow(data.catFood)))) {

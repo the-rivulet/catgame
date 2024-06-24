@@ -1,6 +1,5 @@
 import { Decimal } from './break.js';
 export const TPS = 20;
-alert(TPS);
 export const currentTab = { _: "main" };
 export const loaftime = { _: 0 };
 export const newsfile = ["owo", "uwu", "hello", "uparrow", "x<sup>2</sup>"];

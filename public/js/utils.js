@@ -1,10 +1,8 @@
 import { data, save } from './data.js';
 import { Decimal } from './break.js';
-alert("awawa");
 export function gel(name) {
     return document.getElementById(name);
 }
-alert(gel);
 export function getCatSize(cats) {
     const sizeOfCat = new Decimal(11470.9448); // in cm^3/cat
     const sizeOfAllCats = sizeOfCat.times(cats); // cats * cm^3/cat = cm^3

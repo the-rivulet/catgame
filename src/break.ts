@@ -1,32 +1,12 @@
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if ("value" in descriptor) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-
-function _createClass(Constructor, protoProps?, staticProps?) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  Object.defineProperty(Constructor, "prototype", {
-    writable: false
-  });
-  return Constructor;
-}
 
 /**
  * A LRU cache intended for caching pure functions.
  */
-var LRUCache = /*#__PURE__*/function () {
+class LRUCache {
+  map;
+  first;
+  last;
+  maxSize;
   /**
    * @param maxSize The maximum size for this cache. We recommend setting this
    * to be one less than a power of 2, as most hashtables - including V8's
@@ -35,7 +15,7 @@ var LRUCache = /*#__PURE__*/function () {
    * two, as a .set() call could temporarily set the size of the map to be
    * maxSize + 1.
    */
-  function LRUCache(maxSize) {
+  constructor(maxSize) {
     _classCallCheck(this, LRUCache);
 
     this.map = new Map(); // Invariant: Exactly one of the below is true before and after calling a
@@ -49,9 +29,7 @@ var LRUCache = /*#__PURE__*/function () {
     this.maxSize = maxSize;
   }
 
-  _createClass(LRUCache, [{
-    key: "size",
-    get: function get() {
+  get size() {
       return this.map.size;
     }
     /**
@@ -61,9 +39,7 @@ var LRUCache = /*#__PURE__*/function () {
      * @returns The cached value, or undefined if key is not in the cache.
      */
 
-  }, {
-    key: "get",
-    value: function get(key) {
+  get(key) {
       var node = this.map.get(key);
 
       if (node === undefined) {
@@ -117,9 +93,7 @@ var LRUCache = /*#__PURE__*/function () {
      * @throws Error, if the map already contains the key.
      */
 
-  }, {
-    key: "set",
-    value: function set(key, value) {
+  set(key, value) {
       // Ensure that this.maxSize >= 1.
       if (this.maxSize < 1) {
         return;
@@ -158,233 +132,8 @@ var LRUCache = /*#__PURE__*/function () {
         this.last.next = undefined;
       }
     }
-  }]);
-
-  return LRUCache;
-}();
-/**
- * A node in a doubly linked list.
- */
-
-var ListNode = /*#__PURE__*/_createClass(function ListNode(key, value) {
-  _classCallCheck(this, ListNode);
-
-  this.next = undefined;
-  this.prev = undefined;
-  this.key = key;
-  this.value = value;
-});
-
-var MAX_SIGNIFICANT_DIGITS = 17; //Maximum number of digits of precision to assume in Number
-
-var EXP_LIMIT = 9e15; //If we're ABOVE this value, increase a layer. (9e15 is close to the largest integer that can fit in a Number.)
-
-var LAYER_DOWN = Math.log10(9e15);
-var FIRST_NEG_LAYER = 1 / 9e15; //At layer 0, smaller non-zero numbers than this become layer 1 numbers with negative mag. After that the pattern continues as normal.
-
-var NUMBER_EXP_MAX = 308; //The largest exponent that can appear in a Number, though not all mantissas are valid here.
-
-var NUMBER_EXP_MIN = -324; //The smallest exponent that can appear in a Number, though not all mantissas are valid here.
-
-var MAX_ES_IN_A_ROW = 5; //For default toString behaviour, when to swap from eee... to (e^n) syntax.
-
-var DEFAULT_FROM_STRING_CACHE_SIZE = (1 << 10) - 1; // The default size of the LRU cache used to cache Decimal.fromString.
-
-var powerOf10 = function () {
-  // We need this lookup table because Math.pow(10, exponent)
-  // when exponent's absolute value is large is slightly inaccurate.
-  // You can fix it with the power of math... or just make a lookup table.
-  // Faster AND simpler
-  var powersOf10 = [];
-
-  for (var i = NUMBER_EXP_MIN + 1; i <= NUMBER_EXP_MAX; i++) {
-    powersOf10.push(Number("1e" + i));
   }
 
-  var indexOf0InPowersOf10 = 323;
-  return function (power) {
-    return powersOf10[power + indexOf0InPowersOf10];
-  };
-}(); //tetration/slog to real height stuff
-//background info and tables of values for critical functions taken here: https://github.com/Patashu/break_eternity.js/issues/22
-
-
-var critical_headers = [2, Math.E, 3, 4, 5, 6, 7, 8, 9, 10];
-var critical_tetr_values = [[// Base 2 (using http://myweb.astate.edu/wpaulsen/tetcalc/tetcalc.html )
-1, 1.0891180521811202527, 1.1789767925673958433, 1.2701455431742086633, 1.3632090180450091941, 1.4587818160364217007, 1.5575237916251418333, 1.6601571006859253673, 1.7674858188369780435, 1.8804192098842727359, 2], [// Base E (using http://myweb.astate.edu/wpaulsen/tetcalc/tetcalc.html )
-1, 1.1121114330934078681, 1.2310389249316089299, 1.3583836963111376089, 1.4960519303993531879, 1.6463542337511945810, 1.8121385357018724464, 1.9969713246183068478, 2.2053895545527544330, 2.4432574483385252544, Math.E //1.0
-], [// Base 3
-1, 1.1187738849693603, 1.2464963939368214, 1.38527004705667, 1.5376664685821402, 1.7068895236551784, 1.897001227148399, 2.1132403089001035, 2.362480153784171, 2.6539010333870774, 3], [// Base 4
-1, 1.1367350847096405, 1.2889510672956703, 1.4606478703324786, 1.6570295196661111, 1.8850062585672889, 2.1539465047453485, 2.476829779693097, 2.872061932789197, 3.3664204535587183, 4], [// Base 5
-1, 1.1494592900767588, 1.319708228183931, 1.5166291280087583, 1.748171114438024, 2.0253263297298045, 2.3636668498288547, 2.7858359149579424, 3.3257226212448145, 4.035730287722532, 5], [// Base 6
-1, 1.159225940787673, 1.343712473580932, 1.5611293155111927, 1.8221199554561318, 2.14183924486326, 2.542468319282638, 3.0574682501653316, 3.7390572020926873, 4.6719550537360774, 6], [// Base 7
-1, 1.1670905356972596, 1.3632807444991446, 1.5979222279405536, 1.8842640123816674, 2.2416069644878687, 2.69893426559423, 3.3012632110403577, 4.121250340630164, 5.281493033448316, 7], [// Base 8
-1, 1.1736630594087796, 1.379783782386201, 1.6292821855668218, 1.9378971836180754, 2.3289975651071977, 2.8384347394720835, 3.5232708454565906, 4.478242031114584, 5.868592169644505, 8], [// Base 9
-1, 1.1793017514670474, 1.394054150657457, 1.65664127441059, 1.985170999970283, 2.4069682290577457, 2.9647310119960752, 3.7278665320924946, 4.814462547283592, 6.436522247411611, 9], [// Base 10 (using http://myweb.astate.edu/wpaulsen/tetcalc/tetcalc.html )
-1, 1.1840100246247336579, 1.4061375836156954169, 1.6802272208863963918, 2.026757028388618927, 2.4770056063449647580, 3.0805252717554819987, 3.9191964192627283911, 5.1351528408331864230, 6.9899611795347148455, 10]];
-var critical_slog_values = [[// Base 2
--1, -0.9194161097107025, -0.8335625019330468, -0.7425599821143978, -0.6466611521029437, -0.5462617907227869, -0.4419033816638769, -0.3342645487554494, -0.224140440909962, -0.11241087890006762, 0], [// Base E
--1, -0.90603157029014, -0.80786507256596, -0.7064666939634, -0.60294836853664, -0.49849837513117, -0.39430303318768, -0.29147201034755, -0.19097820800866, -0.09361896280296, 0 //1.0
-], [// Base 3
--1, -0.9021579584316141, -0.8005762598234203, -0.6964780623319391, -0.5911906810998454, -0.486050182576545, -0.3823089430815083, -0.28106046722897615, -0.1831906535795894, -0.08935809204418144, 0], [// Base 4
--1, -0.8917227442365535, -0.781258746326964, -0.6705130326902455, -0.5612813129406509, -0.4551067709033134, -0.35319256652135966, -0.2563741554088552, -0.1651412821106526, -0.0796919581982668, 0], [// Base 5
--1, -0.8843387974366064, -0.7678744063886243, -0.6529563724510552, -0.5415870994657841, -0.4352842206588936, -0.33504449124791424, -0.24138853420685147, -0.15445285440944467, -0.07409659641336663, 0], [// Base 6
--1, -0.8786709358426346, -0.7577735191184886, -0.6399546189952064, -0.527284921869926, -0.4211627631006314, -0.3223479611761232, -0.23107655627789858, -0.1472057700818259, -0.07035171210706326, 0], [// Base 7
--1, -0.8740862815291583, -0.7497032990976209, -0.6297119746181752, -0.5161838335958787, -0.41036238255751956, -0.31277212146489963, -0.2233976621705518, -0.1418697367979619, -0.06762117662323441, 0], [// Base 8
--1, -0.8702632331800649, -0.7430366914122081, -0.6213373075161548, -0.5072025698095242, -0.40171437727184167, -0.30517930701410456, -0.21736343968190863, -0.137710238299109, -0.06550774483471955, 0], [// Base 9
--1, -0.8670016295947213, -0.7373984232432306, -0.6143173985094293, -0.49973884395492807, -0.394584953527678, -0.2989649949848695, -0.21245647317021688, -0.13434688362382652, -0.0638072667348083, 0], [// Base 10
--1, -0.8641642839543857, -0.732534623168535, -0.6083127477059322, -0.4934049257184696, -0.3885773075899922, -0.29376029055315767, -0.2083678561173622, -0.13155653399373268, -0.062401588652553186, 0]];
-
-var D = function D(value) {
-  return Decimal.fromValue_noAlloc(value);
-};
-
-var FC = function FC(sign, layer, mag) {
-  return Decimal.fromComponents(sign, layer, mag);
-};
-
-var FC_NN = function FC_NN(sign, layer, mag) {
-  return Decimal.fromComponents_noNormalize(sign, layer, mag);
-}; // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
-var decimalPlaces = function decimalPlaces(value, places) {
-  var len = places + 1;
-  var numDigits = Math.ceil(Math.log10(Math.abs(value)));
-  var rounded = Math.round(value * Math.pow(10, len - numDigits)) * Math.pow(10, numDigits - len);
-  return parseFloat(rounded.toFixed(Math.max(len - numDigits, 0)));
-};
-
-var f_maglog10 = function f_maglog10(n) {
-  return Math.sign(n) * Math.log10(Math.abs(n));
-}; //from HyperCalc source code
-
-
-var f_gamma = function f_gamma(n) {
-  if (!isFinite(n)) {
-    return n;
-  }
-
-  if (n < -50) {
-    if (n === Math.trunc(n)) {
-      return Number.NEGATIVE_INFINITY;
-    }
-
-    return 0;
-  }
-
-  var scal1 = 1;
-
-  while (n < 10) {
-    scal1 = scal1 * n;
-    ++n;
-  }
-
-  n -= 1;
-  var l = 0.9189385332046727; //0.5*Math.log(2*Math.PI)
-
-  l = l + (n + 0.5) * Math.log(n);
-  l = l - n;
-  var n2 = n * n;
-  var np = n;
-  l = l + 1 / (12 * np);
-  np = np * n2;
-  l = l + 1 / (360 * np);
-  np = np * n2;
-  l = l + 1 / (1260 * np);
-  np = np * n2;
-  l = l + 1 / (1680 * np);
-  np = np * n2;
-  l = l + 1 / (1188 * np);
-  np = np * n2;
-  l = l + 691 / (360360 * np);
-  np = np * n2;
-  l = l + 7 / (1092 * np);
-  np = np * n2;
-  l = l + 3617 / (122400 * np);
-  return Math.exp(l) / scal1;
-};
-
-var _EXPN1 = 0.36787944117144232159553; // exp(-1)
-
-var OMEGA = 0.56714329040978387299997; // W(1, 0)
-//from https://math.stackexchange.com/a/465183
-// The evaluation can become inaccurate very close to the branch point
-
-var f_lambertw = function f_lambertw(z) {
-  var tol = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1e-10;
-  var w;
-  var wn;
-
-  if (!Number.isFinite(z)) {
-    return z;
-  }
-
-  if (z === 0) {
-    return z;
-  }
-
-  if (z === 1) {
-    return OMEGA;
-  }
-
-  if (z < 10) {
-    w = 0;
-  } else {
-    w = Math.log(z) - Math.log(Math.log(z));
-  }
-
-  for (var i = 0; i < 100; ++i) {
-    wn = (z * Math.exp(-w) + w * w) / (w + 1);
-
-    if (Math.abs(wn - w) < tol * Math.abs(wn)) {
-      return wn;
-    } else {
-      w = wn;
-    }
-  }
-
-  throw Error("Iteration failed to converge: ".concat(z.toString())); //return Number.NaN;
-}; //from https://github.com/scipy/scipy/blob/8dba340293fe20e62e173bdf2c10ae208286692f/scipy/special/lambertw.pxd
-// The evaluation can become inaccurate very close to the branch point
-// at ``-1/e``. In some corner cases, `lambertw` might currently
-// fail to converge, or can end up on the wrong branch.
-
-
-function d_lambertw(z) {
-  var tol = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1e-10;
-  var w;
-  var ew, wewz, wn;
-
-  if (!Number.isFinite(z.mag)) {
-    return z;
-  }
-
-  if (z.eq(Decimal.dZero)) {
-    return z;
-  }
-
-  if (z.eq(Decimal.dOne)) {
-    //Split out this case because the asymptotic series blows up
-    return Decimal.fromNumber(OMEGA);
-  } //Get an initial guess for Halley's method
-
-
-  w = Decimal.ln(z); //Halley's method; see 5.9 in [1]
-
-  for (var i = 0; i < 100; ++i) {
-    ew = w.neg().exp();
-    wewz = w.sub(z.mul(ew));
-    wn = w.sub(wewz.div(w.add(1).sub(w.add(2).mul(wewz).div(Decimal.mul(2, w).add(2)))));
-
-    if (Decimal.abs(wn.sub(w)).lt(Decimal.abs(wn).mul(tol))) {
-      return wn;
-    } else {
-      w = wn;
-    }
-  }
-
-  throw Error("Iteration failed to converge: ".concat(z.toString())); //return Decimal.dNaN;
-}
 /**
  * The value of the Decimal is sign * 10^10^10...^mag, with (layer) 10s. If the layer is not 0, then negative mag means it's the reciprocal of the corresponding number with positive mag.
  */
@@ -4272,25 +4021,271 @@ export class Decimal {
         return Math.pow(base, Math.log(lower) / Math.log(base) * (1 - frac) + Math.log(upper) / Math.log(base) * frac);
       }
     }
-    static dZero = FC_NN(0, 0, 0);
-    static dOne = FC_NN(1, 0, 1);
-    static dNegOne = FC_NN(-1, 0, 1);
-    static dTwo = FC_NN(1, 0, 2);
-    static dTen = FC_NN(1, 0, 10);
-    static dNaN = FC_NN(Number.NaN, Number.NaN, Number.NaN);
-    static dInf = FC_NN(1, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
-    static dNegInf = FC_NN(-1, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-    static dNumberMax = FC(1, 0, Number.MAX_VALUE);
-    static dNumberMin = FC(1, 0, Number.MIN_VALUE);
+    static dZero = Decimal.fromComponents_noNormalize(0, 0, 0);
+    static dOne = Decimal.fromComponents_noNormalize(1, 0, 1);
+    static dNegOne = Decimal.fromComponents_noNormalize(-1, 0, 1);
+    static dTwo = Decimal.fromComponents_noNormalize(1, 0, 2);
+    static dTen = Decimal.fromComponents_noNormalize(1, 0, 10);
+    static dNaN = Decimal.fromComponents_noNormalize(Number.NaN, Number.NaN, Number.NaN);
+    static dInf = Decimal.fromComponents_noNormalize(1, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+    static dNegInf = Decimal.fromComponents_noNormalize(-1, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+    static dNumberMax = Decimal.fromComponents(1, 0, Number.MAX_VALUE);
+    static dNumberMin = Decimal.fromComponents(1, 0, Number.MIN_VALUE);
     static fromStringCache = new LRUCache(DEFAULT_FROM_STRING_CACHE_SIZE); // return Decimal;
   }
 // Optimise Decimal aliases.
 // We can't do this optimisation before Decimal is assigned.
-
-D = Decimal.fromValue_noAlloc;
-FC = Decimal.fromComponents;
-FC_NN = Decimal.fromComponents_noNormalize; // eslint-disable-next-line @typescript-eslint/no-unused-vars
+// [edit] yeah no.
 
 Decimal.fromMantissaExponent; // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 Decimal.fromMantissaExponent_noNormalize;
+
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps?, staticProps?) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  Object.defineProperty(Constructor, "prototype", {
+    writable: false
+  });
+  return Constructor;
+}
+/**
+ * A node in a doubly linked list.
+ */
+
+var ListNode = /*#__PURE__*/_createClass(function ListNode(key, value) {
+  _classCallCheck(this, ListNode);
+
+  this.next = undefined;
+  this.prev = undefined;
+  this.key = key;
+  this.value = value;
+});
+
+var MAX_SIGNIFICANT_DIGITS = 17; //Maximum number of digits of precision to assume in Number
+
+var EXP_LIMIT = 9e15; //If we're ABOVE this value, increase a layer. (9e15 is close to the largest integer that can fit in a Number.)
+
+var LAYER_DOWN = Math.log10(9e15);
+var FIRST_NEG_LAYER = 1 / 9e15; //At layer 0, smaller non-zero numbers than this become layer 1 numbers with negative mag. After that the pattern continues as normal.
+
+var NUMBER_EXP_MAX = 308; //The largest exponent that can appear in a Number, though not all mantissas are valid here.
+
+var NUMBER_EXP_MIN = -324; //The smallest exponent that can appear in a Number, though not all mantissas are valid here.
+
+var MAX_ES_IN_A_ROW = 5; //For default toString behaviour, when to swap from eee... to (e^n) syntax.
+
+var DEFAULT_FROM_STRING_CACHE_SIZE = (1 << 10) - 1; // The default size of the LRU cache used to cache Decimal.fromString.
+
+var powerOf10 = function () {
+  // We need this lookup table because Math.pow(10, exponent)
+  // when exponent's absolute value is large is slightly inaccurate.
+  // You can fix it with the power of math... or just make a lookup table.
+  // Faster AND simpler
+  var powersOf10 = [];
+
+  for (var i = NUMBER_EXP_MIN + 1; i <= NUMBER_EXP_MAX; i++) {
+    powersOf10.push(Number("1e" + i));
+  }
+
+  var indexOf0InPowersOf10 = 323;
+  return function (power) {
+    return powersOf10[power + indexOf0InPowersOf10];
+  };
+}(); //tetration/slog to real height stuff
+//background info and tables of values for critical functions taken here: https://github.com/Patashu/break_eternity.js/issues/22
+
+
+var critical_headers = [2, Math.E, 3, 4, 5, 6, 7, 8, 9, 10];
+var critical_tetr_values = [[// Base 2 (using http://myweb.astate.edu/wpaulsen/tetcalc/tetcalc.html )
+1, 1.0891180521811202527, 1.1789767925673958433, 1.2701455431742086633, 1.3632090180450091941, 1.4587818160364217007, 1.5575237916251418333, 1.6601571006859253673, 1.7674858188369780435, 1.8804192098842727359, 2], [// Base E (using http://myweb.astate.edu/wpaulsen/tetcalc/tetcalc.html )
+1, 1.1121114330934078681, 1.2310389249316089299, 1.3583836963111376089, 1.4960519303993531879, 1.6463542337511945810, 1.8121385357018724464, 1.9969713246183068478, 2.2053895545527544330, 2.4432574483385252544, Math.E //1.0
+], [// Base 3
+1, 1.1187738849693603, 1.2464963939368214, 1.38527004705667, 1.5376664685821402, 1.7068895236551784, 1.897001227148399, 2.1132403089001035, 2.362480153784171, 2.6539010333870774, 3], [// Base 4
+1, 1.1367350847096405, 1.2889510672956703, 1.4606478703324786, 1.6570295196661111, 1.8850062585672889, 2.1539465047453485, 2.476829779693097, 2.872061932789197, 3.3664204535587183, 4], [// Base 5
+1, 1.1494592900767588, 1.319708228183931, 1.5166291280087583, 1.748171114438024, 2.0253263297298045, 2.3636668498288547, 2.7858359149579424, 3.3257226212448145, 4.035730287722532, 5], [// Base 6
+1, 1.159225940787673, 1.343712473580932, 1.5611293155111927, 1.8221199554561318, 2.14183924486326, 2.542468319282638, 3.0574682501653316, 3.7390572020926873, 4.6719550537360774, 6], [// Base 7
+1, 1.1670905356972596, 1.3632807444991446, 1.5979222279405536, 1.8842640123816674, 2.2416069644878687, 2.69893426559423, 3.3012632110403577, 4.121250340630164, 5.281493033448316, 7], [// Base 8
+1, 1.1736630594087796, 1.379783782386201, 1.6292821855668218, 1.9378971836180754, 2.3289975651071977, 2.8384347394720835, 3.5232708454565906, 4.478242031114584, 5.868592169644505, 8], [// Base 9
+1, 1.1793017514670474, 1.394054150657457, 1.65664127441059, 1.985170999970283, 2.4069682290577457, 2.9647310119960752, 3.7278665320924946, 4.814462547283592, 6.436522247411611, 9], [// Base 10 (using http://myweb.astate.edu/wpaulsen/tetcalc/tetcalc.html )
+1, 1.1840100246247336579, 1.4061375836156954169, 1.6802272208863963918, 2.026757028388618927, 2.4770056063449647580, 3.0805252717554819987, 3.9191964192627283911, 5.1351528408331864230, 6.9899611795347148455, 10]];
+var critical_slog_values = [[// Base 2
+-1, -0.9194161097107025, -0.8335625019330468, -0.7425599821143978, -0.6466611521029437, -0.5462617907227869, -0.4419033816638769, -0.3342645487554494, -0.224140440909962, -0.11241087890006762, 0], [// Base E
+-1, -0.90603157029014, -0.80786507256596, -0.7064666939634, -0.60294836853664, -0.49849837513117, -0.39430303318768, -0.29147201034755, -0.19097820800866, -0.09361896280296, 0 //1.0
+], [// Base 3
+-1, -0.9021579584316141, -0.8005762598234203, -0.6964780623319391, -0.5911906810998454, -0.486050182576545, -0.3823089430815083, -0.28106046722897615, -0.1831906535795894, -0.08935809204418144, 0], [// Base 4
+-1, -0.8917227442365535, -0.781258746326964, -0.6705130326902455, -0.5612813129406509, -0.4551067709033134, -0.35319256652135966, -0.2563741554088552, -0.1651412821106526, -0.0796919581982668, 0], [// Base 5
+-1, -0.8843387974366064, -0.7678744063886243, -0.6529563724510552, -0.5415870994657841, -0.4352842206588936, -0.33504449124791424, -0.24138853420685147, -0.15445285440944467, -0.07409659641336663, 0], [// Base 6
+-1, -0.8786709358426346, -0.7577735191184886, -0.6399546189952064, -0.527284921869926, -0.4211627631006314, -0.3223479611761232, -0.23107655627789858, -0.1472057700818259, -0.07035171210706326, 0], [// Base 7
+-1, -0.8740862815291583, -0.7497032990976209, -0.6297119746181752, -0.5161838335958787, -0.41036238255751956, -0.31277212146489963, -0.2233976621705518, -0.1418697367979619, -0.06762117662323441, 0], [// Base 8
+-1, -0.8702632331800649, -0.7430366914122081, -0.6213373075161548, -0.5072025698095242, -0.40171437727184167, -0.30517930701410456, -0.21736343968190863, -0.137710238299109, -0.06550774483471955, 0], [// Base 9
+-1, -0.8670016295947213, -0.7373984232432306, -0.6143173985094293, -0.49973884395492807, -0.394584953527678, -0.2989649949848695, -0.21245647317021688, -0.13434688362382652, -0.0638072667348083, 0], [// Base 10
+-1, -0.8641642839543857, -0.732534623168535, -0.6083127477059322, -0.4934049257184696, -0.3885773075899922, -0.29376029055315767, -0.2083678561173622, -0.13155653399373268, -0.062401588652553186, 0]];
+
+ function D(value) {
+  return Decimal.fromValue_noAlloc(value);
+};
+
+ function FC(sign, layer, mag) {
+  return Decimal.fromComponents(sign, layer, mag);
+};
+
+ function FC_NN(sign, layer, mag) {
+  return Decimal.fromComponents_noNormalize(sign, layer, mag);
+}; // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+var decimalPlaces = function decimalPlaces(value, places) {
+  var len = places + 1;
+  var numDigits = Math.ceil(Math.log10(Math.abs(value)));
+  var rounded = Math.round(value * Math.pow(10, len - numDigits)) * Math.pow(10, numDigits - len);
+  return parseFloat(rounded.toFixed(Math.max(len - numDigits, 0)));
+};
+
+var f_maglog10 = function f_maglog10(n) {
+  return Math.sign(n) * Math.log10(Math.abs(n));
+}; //from HyperCalc source code
+
+
+var f_gamma = function f_gamma(n) {
+  if (!isFinite(n)) {
+    return n;
+  }
+
+  if (n < -50) {
+    if (n === Math.trunc(n)) {
+      return Number.NEGATIVE_INFINITY;
+    }
+
+    return 0;
+  }
+
+  var scal1 = 1;
+
+  while (n < 10) {
+    scal1 = scal1 * n;
+    ++n;
+  }
+
+  n -= 1;
+  var l = 0.9189385332046727; //0.5*Math.log(2*Math.PI)
+
+  l = l + (n + 0.5) * Math.log(n);
+  l = l - n;
+  var n2 = n * n;
+  var np = n;
+  l = l + 1 / (12 * np);
+  np = np * n2;
+  l = l + 1 / (360 * np);
+  np = np * n2;
+  l = l + 1 / (1260 * np);
+  np = np * n2;
+  l = l + 1 / (1680 * np);
+  np = np * n2;
+  l = l + 1 / (1188 * np);
+  np = np * n2;
+  l = l + 691 / (360360 * np);
+  np = np * n2;
+  l = l + 7 / (1092 * np);
+  np = np * n2;
+  l = l + 3617 / (122400 * np);
+  return Math.exp(l) / scal1;
+};
+
+var _EXPN1 = 0.36787944117144232159553; // exp(-1)
+
+var OMEGA = 0.56714329040978387299997; // W(1, 0)
+//from https://math.stackexchange.com/a/465183
+// The evaluation can become inaccurate very close to the branch point
+
+var f_lambertw = function f_lambertw(z) {
+  var tol = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1e-10;
+  var w;
+  var wn;
+
+  if (!Number.isFinite(z)) {
+    return z;
+  }
+
+  if (z === 0) {
+    return z;
+  }
+
+  if (z === 1) {
+    return OMEGA;
+  }
+
+  if (z < 10) {
+    w = 0;
+  } else {
+    w = Math.log(z) - Math.log(Math.log(z));
+  }
+
+  for (var i = 0; i < 100; ++i) {
+    wn = (z * Math.exp(-w) + w * w) / (w + 1);
+
+    if (Math.abs(wn - w) < tol * Math.abs(wn)) {
+      return wn;
+    } else {
+      w = wn;
+    }
+  }
+
+  throw Error("Iteration failed to converge: ".concat(z.toString())); //return Number.NaN;
+}; //from https://github.com/scipy/scipy/blob/8dba340293fe20e62e173bdf2c10ae208286692f/scipy/special/lambertw.pxd
+// The evaluation can become inaccurate very close to the branch point
+// at ``-1/e``. In some corner cases, `lambertw` might currently
+// fail to converge, or can end up on the wrong branch.
+
+
+function d_lambertw(z) {
+  var tol = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1e-10;
+  var w;
+  var ew, wewz, wn;
+
+  if (!Number.isFinite(z.mag)) {
+    return z;
+  }
+
+  if (z.eq(Decimal.dZero)) {
+    return z;
+  }
+
+  if (z.eq(Decimal.dOne)) {
+    //Split out this case because the asymptotic series blows up
+    return Decimal.fromNumber(OMEGA);
+  } //Get an initial guess for Halley's method
+
+
+  w = Decimal.ln(z); //Halley's method; see 5.9 in [1]
+
+  for (var i = 0; i < 100; ++i) {
+    ew = w.neg().exp();
+    wewz = w.sub(z.mul(ew));
+    wn = w.sub(wewz.div(w.add(1).sub(w.add(2).mul(wewz).div(Decimal.mul(2, w).add(2)))));
+
+    if (Decimal.abs(wn.sub(w)).lt(Decimal.abs(wn).mul(tol))) {
+      return wn;
+    } else {
+      w = wn;
+    }
+  }
+
+  throw Error("Iteration failed to converge: ".concat(z.toString())); //return Decimal.dNaN;
+}
