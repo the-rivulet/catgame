@@ -1,4 +1,4 @@
-import Decimal from "break_eternity.js";
+import { Decimal } from './break.js';
 
 const TPS = 20;
 

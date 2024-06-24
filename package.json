@@ -3,6 +3,7 @@
 	"version": "1.0.0",
 	"description": "a silly game about cats",
 	"main": "null",
+	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "vite build",
@@ -12,10 +13,10 @@
 	"author": "frinkifail, teste and catgame dev team",
 	"license": "ISC",
 	"dependencies": {
-		"break_eternity.js": "^1.4.2"
+		"break_eternity.js": "^1.4.2",
+		"http-server": "^14.1.1"
 	},
 	"devDependencies": {
-		"vite": "^5.2.11",
-		"typescript": "^5.4.5"
+		"typescript": "^5.5.2"
 	}
 }

@@ -8,19 +8,25 @@
 	<meta property="og:title" content="CatGame">
 	<meta property="og:description" content="get cat">
 	<title>Cat Game</title>
-	<link href="dark.css" rel="stylesheet" type="text/css" />
+	<link href="dark.css" rel="stylesheet" />
+	<link href="frinkis.css" rel="stylesheet" />
 	<link rel="icon" type="image/x-icon"
 		href="https://cdn.glitch.global/1be1d1e2-9728-453c-8f0d-285db27f9993/catgamelogo.png?v=1694041923462" />
 
-  <script type="module" crossorigin src="/assets/index-CSGvvazv.js"></script>
 </head>
 
 <body>
+	<div id="debug">
+		<h4>Performance</h4>
+		<p>Target MSPT: <span id="target-mspt"></span>ms</p>
+		<p>MSPT: <span id="mspt"></span>ms</p>
+		<p>Average MSPT: <span id="avg-mspt"></span>ms</p>
+	</div>
 	<div id="overlay"></div>
 	<div id="loafing">
 		Loafing...<br>
 	</div>
-	<div style="position: sticky; top: 0px; background-color: #222222;">
+	<div style="position: sticky; top: 0px;">
 		<p id="newstickernomar">
 			<span id="newsticker">
 				newsticker
@@ -222,7 +228,7 @@
 		<br><textarea spellcheck="false" id="savedata" style="resize: both" placeholder="save here"></textarea>
 
 		<h3>Secret Codes</h3>
-		<button class="button" onclick="VerifyCode(document.getElementById('secretpasses').value)">
+		<button class="button" id="verify-code">
 			<div style="font-size:20px;">Input</div><textarea spellcheck="false" rows="1" cols="14" id="secretpasses"
 				maxlength="16"
 				onkeyup="this.value = this.value.replace(/[A-Z\s\.:;\\\[\]\*\+\-\?!{}]/g, '')"></textarea>
@@ -259,9 +265,6 @@
 		<button class="button" onclick="d.cats = d.cats">Always Power Outage</button><br>
 		<!-- exit --><br><button onclick="tab = 'options'" class="button">Return to Options</button>
 	</span>
-
-
-
+	<script type="text/javascript" src="js/main.js" type="module"></script>
 </body>
-
 </html>

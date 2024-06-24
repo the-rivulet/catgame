@@ -1,4 +1,4 @@
-import Decimal from "break_eternity.js";
+import { Decimal } from './break.js';
 
 export function exponentialFormat(num: Decimal, precision: number) {
     let e: string | number = num.exponent;
@@ -108,5 +108,5 @@ export function toPlaces(x: Decimal, precision: number, maxAccepted: number) {
     return result;
 }
 
-export const formatForH = (x: Decimal | number) => format(x)
-export const formatForZ = (x: Decimal | number) => format(x, 0, true)
+export const formatForH = (x: Decimal) => format(x)
+export const formatForZ = (x: Decimal) => format(x, 0, true)
